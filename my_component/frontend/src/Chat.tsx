@@ -23,7 +23,7 @@ class Chat extends StreamlitComponentBase<State> {
     // be available to the Python program.
     return (
       <>
-
+        <img src="assets/thomas_more_logo.svg" alt="Thomas More Logo" className="absolute top-0 left-0 w-10 object-contain" />
       </>
     )
   }

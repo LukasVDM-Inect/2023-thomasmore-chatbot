@@ -3,34 +3,16 @@ from PIL import Image
 from pathlib import Path
 from image_generator import generate_images_with_icons
 import base64
+from streamlit.components.v1 import components, html
 
 
 def get_image_base64(image_name):
     media_folder = Path(__file__).parent.parent / 'assets'
     image_path = media_folder / image_name
+    print(image_path)
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode()
 
-def get_image_html(image_path):
-    return f"""
-    <img 
-        src="{image_path}" 
-        style="cursor: pointer;" 
-        onclick="openFullscreen(this);" 
-        width="300"  <!-- Adjust width as needed -->
-    />
-    <script>
-    function openFullscreen(elem) {{
-        if (elem.requestFullscreen) {{
-            elem.requestFullscreen();
-        }} else if (elem.webkitRequestFullscreen) {{ /* Safari */
-            elem.webkitRequestFullscreen();
-        }} else if (elem.msRequestFullscreen) {{ /* IE11 */
-            elem.msRequestFullscreen();
-        }}
-    }}
-    </script>
-    """
 
 user_icon = Image.open("./assets/user_icon.png")
 ai_icon = Image.open("./assets/ai_icon.png")
@@ -89,13 +71,22 @@ a:hover,  a:active {{
     text-align: right;
 }}
 
+iframe {{
+    width: 150px;
+    height: 200px;
+}}
+
+iframe img {{
+    object-fit: contain;
+}}
+
 </style>
 <div class="footer">
     <img class="logo" src="data:image/png;base64,{get_image_base64('thomas_more_logo.png')}"  />
     <img class="logo" src="data:image/png;base64,{get_image_base64('inect_logo.png')}"  />
 </div>
 <script>
-    console.log({tm_logo})
+    
 </script>
 """
 
@@ -109,6 +100,8 @@ prompt = st.chat_input("Ask me something...")
 # # Set a default model
 # if "openai_model" not in st.session_state:
 #     st.session_state["openai_model"] = "gpt-3.5-turbo"
+
+image_comp = components.declare_component(name='my_component', url='http://localhost:3001')
 
 with st.container():
     # Initialize chat history
@@ -135,8 +128,7 @@ with st.container():
             with st.container():
                 st.write(message["content"])
                 if hasattr(message, "image"):
-                    map_with_icons = Image.open(message["image"])
-                    st.image(map_with_icons, width=200)
+                    image_comp(image="data:image/png;base64," + get_image_base64(message['image']), key=index)
 
     # Accept user input
     if prompt:
@@ -156,14 +148,11 @@ with st.container():
         # Display the image as a chat message
         with st.chat_message(name="assistant", avatar=ai_icon):
             st.markdown("You can find companies " + prompt + " on the below plan:")
-            map_with_icons = Image.open("./assets/generated/generated_image.png")
-            # st_image = st.image(image=map_with_icons, width=200)
-            image_html = get_image_html("./assets/generated/generated_image.png")
-            st.markdown(image_html, unsafe_allow_html=True)
+            image_comp(image="data:image/png;base64," + get_image_base64("generated/generated_image.png"), key="new")
 
         st.session_state.messages.append({
             "role": "assistant",
             "content": "You can find companies " + prompt + " on the below plan:",
             "avatar": ai_icon,
-            "image": "./assets/generated/generated_image.png"
+            "image": "generated/generated_image.png"
          })

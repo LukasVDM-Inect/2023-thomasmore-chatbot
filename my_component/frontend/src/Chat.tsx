@@ -6,7 +6,7 @@ import {
 import React, { ReactNode } from "react"
 
 interface State {
-
+  image: string
 }
 
 /**
@@ -14,7 +14,38 @@ interface State {
  * automatically when your component should be re-rendered.
  */
 class Chat extends StreamlitComponentBase<State> {
-  public state = {  }
+  public state : State = { image: this.props.args["image"] }
+
+  componentDidMount() {
+    document.addEventListener("fullscreenchange", this.onFullScreenChange);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener("fullscreenchange", this.onFullScreenChange);
+  }
+
+  handleImageClick = (event: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+    const element = event.currentTarget;
+    if (element.requestFullscreen) {
+      element.requestFullscreen();
+    } else if ((element as any).webkitRequestFullscreen) { // Safari
+      (element as any).webkitRequestFullscreen();
+    } else if ((element as any).msRequestFullscreen) { // IE11
+      (element as any).msRequestFullscreen();
+    }
+  }
+
+  onFullScreenChange = () => {
+    if (document.fullscreenElement) {
+      // Add semi-transparent background and close button when in full screen
+      const fullscreenElement = document.fullscreenElement as HTMLElement;
+      fullscreenElement.style.background = 'rgba(0, 0, 0, 0.5)';
+      const closeButton = document.createElement('button');
+      closeButton.innerText = 'Close';
+      closeButton.onclick = () => document.exitFullscreen();
+      document.fullscreenElement.appendChild(closeButton);
+    }
+  }
 
   public render = (): ReactNode => {
     // Show a button and some text.
@@ -23,7 +54,9 @@ class Chat extends StreamlitComponentBase<State> {
     // be available to the Python program.
     return (
       <>
-        <img src="assets/thomas_more_logo.svg" alt="Thomas More Logo" className="absolute top-0 left-0 w-10 object-contain" />
+        <div className="">
+          <img onClick={this.handleImageClick} src={this.state.image} alt="Thomas More Logo" width="150px" />
+        </div>
       </>
     )
   }

@@ -27,6 +27,7 @@ def generate_images_with_icons(numbers, output_path):
 
     # Save the image to the specified output path
     cv2.imwrite(output_path, image)
+
     return image
 
 def draw_icon(image, position, icon=None):

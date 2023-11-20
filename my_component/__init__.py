@@ -142,21 +142,32 @@ with st.container():
         with st.chat_message(name="user", avatar=user_icon):
             st.markdown(prompt)
 
-        # Extract numbers as list
-        numbers = [int(num.strip()) for num in prompt.split()]
+        # Extract input items and validate
+        input_items = prompt.split()
+        valid_numbers = {'1', '2', '3'}
+        is_valid_input = all(item in valid_numbers for item in input_items)
 
-        # Generate the image
-        output_image_path = 'assets/generated/generated_image.png'
-        result_image = generate_images_with_icons(numbers, output_image_path)
+        if is_valid_input:
+            numbers = [int(item) for item in input_items]
 
-        # Display the image as a chat message
-        with st.chat_message(name="assistant", avatar=ai_icon):
-            st.markdown("You can find companies " + prompt + " on the below plan:")
-            image_comp(image="data:image/png;base64," + get_image_base64("generated/generated_image.png"), key="new")
+            # Generate the image
+            output_image_path = 'assets/generated/generated_image.png'
+            result_image = generate_images_with_icons(numbers, output_image_path)
+
+            # Display the image as a chat message
+            with st.chat_message(name="assistant", avatar=ai_icon):
+                content = "You can find companies " + prompt + " on the below plan:"
+                st.markdown(content)
+                image_comp(image="data:image/png;base64," + get_image_base64("generated/generated_image.png"), key="new")
+        else:
+            # Display a message for invalid input
+            with st.chat_message(name="assistant", avatar=ai_icon):
+                content = "The chatbot is still under development!"
+                st.markdown(content)
 
         st.session_state.messages.append({
             "role": "assistant",
-            "content": "You can find companies " + prompt + " on the below plan:",
+            "content": content,
             "avatar": ai_icon,
             "image": "generated/generated_image.png"
          })

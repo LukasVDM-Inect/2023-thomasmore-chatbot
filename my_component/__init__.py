@@ -1,3 +1,5 @@
+import os
+
 import streamlit as st
 from PIL import Image
 from pathlib import Path
@@ -101,7 +103,9 @@ prompt = st.chat_input("Ask me something...")
 # if "openai_model" not in st.session_state:
 #     st.session_state["openai_model"] = "gpt-3.5-turbo"
 
-image_comp = components.declare_component(name='my_component')
+parent_dir = os.path.dirname(os.path.abspath(__file__))
+build_dir = os.path.join(parent_dir, "frontend/build")
+image_comp = components.declare_component(name='my_component', path=build_dir)
 
 with st.container():
     # Initialize chat history

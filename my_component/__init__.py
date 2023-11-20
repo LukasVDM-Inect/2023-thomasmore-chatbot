@@ -101,7 +101,7 @@ prompt = st.chat_input("Ask me something...")
 # if "openai_model" not in st.session_state:
 #     st.session_state["openai_model"] = "gpt-3.5-turbo"
 
-image_comp = components.declare_component(name='my_component', url='http://localhost:3001')
+image_comp = components.declare_component(name='my_component', url='https://thomasmore.streamlit.app')
 
 with st.container():
     # Initialize chat history
